@@ -1,6 +1,22 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
+from scipy.stats import pearsonr
+
+
+def calculate_and_print_pvalues(df):
+    # get rid of the NaN values, otherwise one is unable to use this function
+    df_cleaned = df.dropna()
+    for column_i in df.columns:
+        for column_j in df.columns:
+            if column_i == column_j:
+                continue
+            else:
+                corr_coeff, p_val = pearsonr(df_cleaned[column_i], df_cleaned[column_j])
+                print(column_i + " AND " + column_j)
+                print("Correlation Coeefficient: ", corr_coeff, "p-value: ", p_val)
+
 
 excel_path = 'survey_results.xlsx'
 all_prompts = ['s', 'ui', 'nsi', 'op', 'eng', 'end']
@@ -8,7 +24,7 @@ eval_criteria = ['correctness', 'friendliness', 'ease_of_reading', 'length']
 
 columns_to_read = []
 
-# Specifying all the columns that should be extracted from the excel file
+# Specifying all the columns that should be extracted from the Excel file
 for prompt in all_prompts:
     for i in range(1, 4):
         for criteria in eval_criteria:
@@ -36,6 +52,9 @@ for prompt in all_prompts:
 
 # calculate the correlation matrix
 correlation_matrix = df_corr.corr()
+
+# calculating the p-values
+calculate_and_print_pvalues(df_corr)
 
 # plot the correlation matrix as a heatmap
 plt.figure(figsize=(8, 6))
